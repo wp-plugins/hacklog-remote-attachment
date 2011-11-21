@@ -22,12 +22,8 @@ For MORE information,please visit the [plugin homepage](http://ihacklog.com/?p=5
 
 Simplified Chinese(zh_CN) language po and mo files. By [荒野无灯](http://ihacklog.com "荒野无灯weblog") @  荒野无灯weblog 
 
-Traditional Chinese(zh_TW) language po and mo files. By [冷.吉米](http://6ala.com "{ 六翼之章 }") @  { 六翼之章 } 
-
-
 目前有中、英文两种语言。
 更多信息请访问[插件主页](http://ihacklog.com/?p=5001 "plugin homepage") 获取关于插件的更多信息，使用技巧等.
-
 简体中文语言包(zh_CN) po 和 mo 文件由 [荒野无灯](http://ihacklog.com "荒野无灯weblog") @  荒野无灯weblog 提供。
 
 
