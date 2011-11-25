@@ -2,8 +2,8 @@
 /*
  Plugin Name: Hacklog Remote Attachment
  Plugin URI: http://ihacklog.com/?p=5001
- Description: WordPress 远程附件上传插件.Remote attachment support for WordPress.
- Version: 1.0.1
+ Description: WordPress 远程附件上传插件.Remote attachment support for WordPress.Support Multisite.
+ Version: 1.0.2
  Author: <a href="http://ihacklog.com/">荒野无灯</a>
  Author URI: http://ihacklog.com/
  */
