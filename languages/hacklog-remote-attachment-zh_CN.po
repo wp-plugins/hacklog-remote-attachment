@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hacklog Remote Attachment\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-25 18:11+0800\n"
-"PO-Revision-Date: 2011-11-25 18:11+0800\n"
+"POT-Creation-Date: 2011-11-25 20:42+0800\n"
+"PO-Revision-Date: 2011-11-25 20:42+0800\n"
 "Last-Translator: 荒野无灯 <admin@ihacklog.com>\n"
 "Language-Team: 荒野无灯 <admin@ihacklog.com>\n"
 "MIME-Version: 1.0\n"
@@ -16,164 +16,164 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-SearchPath-0: D:\\htdocs\\wordpress\\wp-content\\plugins\\hacklog-remote-attachment\n"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:393
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:376
 msgid "failed to make dir on remote server!Pleas check your FTP <a href=\"http://codex.wordpress.org/Changing_File_Permissions\" target=\"_blank\">file permissions</a>"
 msgstr "在远程服务器创建目录失败！请检测FTP <a href=\"http://codex.wordpress.org/Changing_File_Permissions\" target=\"_blank\">文件权限</a>"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:401
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:442
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:388
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:435
 msgid "upload file to remote server failed!"
 msgstr "上传文件到远程服务器失败！"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:487
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:496
 msgid "Explanation of some Options:"
 msgstr "选项解释："
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:488
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:497
 msgid "the <strong>Remote base URL</strong> is the URL to your Ftp root path."
 msgstr " <strong>远程基本URL</strong>即到你的Ftp服务器根目录的URL."
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:489
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:498
 msgid "the <strong>Remote path</strong> is the directory which you save attachment under it and it is relative to your Ftp root path."
 msgstr "<strong>远程路径</strong>即你用来保存附件的目录，相对于你的Ftp根目录。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:490
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:499
 msgid "For more information:"
 msgstr "更多帮助信息："
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:491
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:500
 msgid "<a href=\"http://ihacklog.com/?p=5001\" target=\"_blank\">Plugin Home Page</a>"
 msgstr "<a href=\"http://ihacklog.com?p=5001\" target=\"_blank\">插件主页</a>"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:503
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:589
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:512
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:598
 msgid "Hacklog Remote Attachment Options"
 msgstr "Hacklog远程附件选项"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:503
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:512
 msgid "Hacklog Remote Attachment"
 msgstr "Hacklog远程附件"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:533
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:542
 msgid "Options updated."
 msgstr "选项已经更新。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:538
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:547
 msgid "Nothing changed."
 msgstr "没有任何改变。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:550
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:559
 msgid "Connected successfully."
 msgstr "测试连接成功。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:554
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:563
 msgid "Failed to connect to remote server!"
 msgstr "无法连接远程服务器！"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:577
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:586
 msgid "posts has been updated."
 msgstr "篇日志内容已经被更新。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:582
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:591
 msgid "no posts been updated."
 msgstr "没有日志被更新。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:597
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:606
 msgid "Ftp server"
 msgstr "Ftp服务器"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:601
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:610
 msgid "the IP or domain name of remote file server."
 msgstr "远程服务器的IP或域名。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:605
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:614
 msgid "Ftp server port"
 msgstr "Ftp服务器端口"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:609
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:618
 msgid "the listenning port of remote FTP server."
 msgstr "远程FTP服务器的监听端口。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:614
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:623
 msgid "Ftp username"
 msgstr "Ftp用户名"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:618
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:627
 msgid "the Ftp username."
 msgstr "Ftp用户名。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:623
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:632
 msgid "Ftp password"
 msgstr "Ftp密码"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:627
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:636
 msgid "the password."
 msgstr "Ftp密码，你知道的。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:632
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:641
 msgid "Remote base URL"
 msgstr "远程基本URL"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:637
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:646
 msgid "Remote base URL,the URL to your Ftp root path.for example: <strong>http://www.your-domain.com/</strong>."
 msgstr "远程基本URL,即到你的Ftp根目录的URL。如： <strong>http://www.your-domain.com/</strong>."
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:641
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:650
 msgid "Remote path"
 msgstr "远程路径"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:645
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:654
 msgid "the sub dir.Like <strong>wp-files</strong>"
 msgstr "远程子目录。如 <strong>wp-files</strong>"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:651
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:660
 msgid "Save Options"
 msgstr "保存选项"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:657
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:666
 msgid "Hacklog Remote Attachment Status"
 msgstr "Hacklog远程附件状态"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:660
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:669
 msgid "Space used on remote server:"
 msgstr "远程服务器上的附件已用空间："
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:665
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:674
 msgid "warning:"
 msgstr "敬告："
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:666
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:675
 msgid "if you haven't moved all your attachments OR dont't know what below means,please <strong>DO NOT</strong> click the link below!"
 msgstr "如果你没有移动附件或你不清楚下面说的是什么意思，请<strong>不要</strong> 点击下面的链接！"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:669
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:678
 msgid "Move"
 msgstr ""
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:672
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:681
 msgid "if you have moved all your attachments to the remote server,then you can click"
 msgstr "如果你已经把所有的附件移动到了远程服务器上，你可以点击"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:673
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:681
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:682
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:690
 msgid "Are your sure to do this?Make sure you have backuped your database tables."
 msgstr "你确定要这样做吗？请确保在执行此操作前已经备份好了你的数据库。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:674
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:682
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:683
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:691
 msgid "here"
 msgstr "这里"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:674
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:682
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:683
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:691
 msgid " to update the database."
 msgstr "来更新数据库。"
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:677
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:686
 msgid "Recovery"
 msgstr ""
 
-#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:680
+#: D:\htdocs\wordpress\wp-content\plugins\hacklog-remote-attachment/includes/hacklogra.class.php:689
 msgid "if you have moved all your attachments from the remote server to local server,then you can click"
 msgstr "如果你已经把所有附件从远程服务器转移到了本地服务器，请点击"
 

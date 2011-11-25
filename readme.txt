@@ -4,7 +4,7 @@ Donate link: http://ihacklog.com/about
 Tags: attachment,manager,admin,image,thumbnail,ftp,remote
 Requires at least: 3.2.1
 Tested up to: 3.2.1
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 
 Adds remote attachments support for your WordPress blog.
 
@@ -20,7 +20,7 @@ use this plugin, you can upload any files to remote ftp servers(be aware that yo
 
 For MORE information,please visit the [plugin homepage](http://ihacklog.com/?p=5001 "plugin homepage") for any questions about the plugin.
 [installation guide](http://ihacklog.com/?p=4993 "installation guide") 
-
+version 1.1.0 added compatibility with watermark plugins
 Simplified Chinese(zh_CN) language po and mo files. By [荒野无灯](http://ihacklog.com "荒野无灯weblog") @  荒野无灯weblog 
 
 目前有中、英文两种语言。
@@ -28,6 +28,7 @@ Simplified Chinese(zh_CN) language po and mo files. By [荒野无灯](http://iha
 简体中文语言包(zh_CN) po 和 mo 文件由 [荒野无灯](http://ihacklog.com "荒野无灯weblog") @  荒野无灯weblog 提供。
 1.0.2 增加自动创建远程目录功能。解决在某些FTP服务器出现“在远程服务器创建目录失败”的问题。
 [安装指导](http://ihacklog.com/?p=4993 "安装指导") 
+1.1.0 增加与水印插件的兼容性，使上传到远程服务器的图片同样可以加上水印
 
 == Installation ==
 
@@ -67,3 +68,6 @@ fixed a small bug(cron delete).
 added: remote direcotry auto-make functions.If the remote dir does not exists,the plugin will try to make it.
 added: put index.html to disable directory browsing
 
+= 1.1.0 =
+handle image file in the later(in HOOK wp_generate_attachment_metadata) for compatibility with watermark plugins
+removed the scheduled hook,now delete the orig image file just after uploaded.

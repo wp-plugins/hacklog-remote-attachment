@@ -18,7 +18,7 @@ class hacklogra
 	const opt_key = 'hacklogra_image_to_delete';
 	const opt_space = 'hacklogra_remote_filesize';
 	const opt_primary = 'hacklogra_options';
-	const version = '1.0.2';
+	const version = '1.1.0';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
 	private static $ftp_pwd = 'admin';
@@ -40,12 +40,10 @@ class hacklogra
 		add_filter('wp_handle_upload', array(__CLASS__, 'upload_and_send'));
 		add_filter('media_send_to_editor', array(__CLASS__, 'replace_attachurl'), -999);
 		add_filter('attachment_link', array(__CLASS__, 'replace_baseurl'), -999);
-		//生成缩略图后立即上传生成的文件并删除本地文件
-		add_filter('image_make_intermediate_size', array(__CLASS__, 'upload_resized_file'));
+		//生成缩略图后立即上传生成的文件并删除本地文件,this must after watermark generate
+		add_filter('wp_generate_attachment_metadata', array(__CLASS__, 'upload_images'), 999);
 		//删除远程附件
 		add_action('wp_delete_file', array(__CLASS__, 'delete_remote_file'));
-		//delete orig local image file schedulely
-		add_action('delete_orig_picture_hourly', array(__CLASS__, 'delete_orig_picture'));
 		//menu
 		add_action('admin_menu', array(__CLASS__, 'plugin_menu'));
 		//should load before 'admin_menu' hook ... so,use init hook  
@@ -202,11 +200,12 @@ class hacklogra
 	 */
 	public static function my_activation()
 	{
-		add_option(self::opt_key, array());
 		add_option(self::opt_space, 0);
 		$opt_primary = self::get_default_opts();
 		add_option(self::opt_primary, $opt_primary);
-		wp_schedule_event(time(), 'hourly', 'delete_orig_picture_hourly');
+		//clear the data generate by previous version 1.0.2
+		delete_option(self::opt_key);
+		wp_clear_scheduled_hook('delete_orig_picture_hourly');
 	}
 
 	/**
@@ -216,24 +215,8 @@ class hacklogra
 	 */
 	public static function my_deactivation()
 	{
-		delete_option(self::opt_key);
-		delete_option(self::opt_space);
+		//delete_option(self::opt_space);
 		delete_option(self::opt_primary);
-		wp_clear_scheduled_hook('delete_orig_picture_hourly');
-	}
-
-	/**
-	 * schedule work to delete orig picture file
-	 * @static
-	 * @return void
-	 */
-	public static function delete_orig_picture()
-	{
-		$images_to_delete = get_option(self::opt_key);
-		foreach ($images_to_delete as $file)
-		{
-			unlink($file);
-		}
 	}
 
 	/**
@@ -293,6 +276,8 @@ class hacklogra
 
 		if (!self::$fs->connect())
 			return false; //There was an erorr connecting to the server.
+
+
 
 			
 // Set the permission constants if not already set.
@@ -373,27 +358,30 @@ class hacklogra
 		$localfile = $file['file'];
 		$remotefile = self::$remote_path . self::$subdir . '/' . $local_basename;
 		$remote_subdir = dirname($remotefile);
-		$remote_subdir = str_replace('\\','/', $remote_subdir);
+		$remote_subdir = str_replace('\\', '/', $remote_subdir);
 		if (!self::$fs->is_dir($remote_subdir))
 		{
 			//make sure the dir on FTP server is exists.
-			$subdir = explode('/', $remote_subdir );
+			$subdir = explode('/', $remote_subdir);
 			$i = 0;
 			$dir_needs = '';
-			while( isset($subdir[$i]) && !empty( $subdir[$i]))
-			{
-				$dir_needs .= $subdir[$i] .'/';
+			while (isset($subdir[$i]) && !empty($subdir[$i])) {
+				$dir_needs .= $subdir[$i] . '/';
 				!self::$fs->is_dir($dir_needs) && self::$fs->mkdir($dir_needs, 0777);
 				//disable directory browser
-				!self::$fs->is_file($dir_needs . 'index.html') && self::$fs->put_contents($dir_needs . 'index.html','Silence is golden.');
-				++ $i;
+				!self::$fs->is_file($dir_needs . 'index.html') && self::$fs->put_contents($dir_needs . 'index.html', 'Silence is golden.');
+				++$i;
 			}
 			if (!self::$fs->is_dir($remote_subdir))
 			{
 				return call_user_func($upload_error_handler, &$file, sprintf('%s:' . __('failed to make dir on remote server!Pleas check your FTP <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank">file permissions</a>', self::textdomain), self::plugin_name));
 			}
 		}
-
+		//如果是图片，此处不处理，因为要与水印插件兼容的原因　
+		if (self::is_image_file($file['file']))
+		{
+			return $file;
+		}
 		$content = file_get_contents($localfile);
 		//        return array('error'=> $remotefile);
 		if (!self::$fs->put_contents($remotefile, $content))
@@ -403,19 +391,8 @@ class hacklogra
 		unset($content);
 		//uploaded successfully
 		self::update_filesize_used($localfile);
-
-		//如果是图片，先不删除本地服务器文件,否则，删除本地服务器文件并替换变量　
-		if (!self::is_image_file($file['file']))
-		{
-			unlink($file['file']);
-		}
-		else
-		{
-			$opt_value = get_option(self::opt_key, array());
-			$opt_value[] = $file['file'];
-			update_option(self::opt_key, $opt_value);
-		}
-
+		//delete the local file
+		unlink($file['file']);
 		$file['url'] = str_replace(self::$local_url, self::$remote_url, $file['url']);
 		return $file;
 	}
@@ -423,32 +400,65 @@ class hacklogra
 	/**
 	 * 上传缩略图到远程服务器并删除本地服务器文件
 	 * @static
-	 * @param $resized_file
+	 * @param $metadata from function wp_generate_attachment_metadata
 	 * @return array
 	 */
-	public static function upload_resized_file($resized_file)
+	public static function upload_images($metadata)
 	{
 		if (!self::connect_remote_server())
 		{
-			return $resized_file;
+			return $metadata;
 		}
-		$local_basename = basename($resized_file);
-		$localfile = $resized_file;
-		$remotefile = self::$remote_path . self::$subdir . '/' . $local_basename;
 
-		$content = file_get_contents($resized_file);
-		if (!self::$fs->put_contents($remotefile, $content))
+		//deal with fullsize image file
+		if (!self::upload_file($metadata['file']))
 		{
-			return array('error' => sprintf('%s:' . __('upload file to remote server failed!', self::textdomain), self::plugin_name));
+			return self::raise_upload_error();
+		}
+
+		foreach ($metadata['sizes'] as $image_size => $image_item)
+		{
+			$relative_filepath = dirname($metadata['file']) . DIRECTORY_SEPARATOR . $metadata['sizes'][$image_size]['file'];
+			if (!self::upload_file($relative_filepath))
+			{
+				return self::raise_upload_error();
+			}
+		}
+		return $metadata;
+	}
+
+	/**
+	 * report upload error
+	 * @return type 
+	 */
+	private static function raise_upload_error()
+	{
+		return array('error' => sprintf('%s:' . __('upload file to remote server failed!', self::textdomain), self::plugin_name));
+	}
+
+	/**
+	 * upload single file to remote  FTP  server, used by upload_images
+	 * @param type $relative_path the path relative to upload basedir
+	 * @return type 
+	 */
+	private static function upload_file($relative_path)
+	{
+		$local_filepath = self::$local_basepath . DIRECTORY_SEPARATOR . $relative_path;
+		$local_basename = basename($local_filepath);
+		$remotefile = self::$remote_path . self::$subdir . '/' . $local_basename;
+		$file_data = file_get_contents($local_filepath);
+		if (!self::$fs->put_contents($remotefile, $file_data))
+		{
+			return FALSE;
 		}
 		else
 		{
 			//更新占用空间
-			self::update_filesize_used($localfile);
-			unlink($resized_file);
+			self::update_filesize_used($local_filepath);
+			unlink($local_filepath);
+			unset($file_data);
+			return TRUE;
 		}
-		unset($content);
-		return $resized_file;
 	}
 
 	/**
@@ -630,7 +640,7 @@ class hacklogra
 
 					<tr valign="top">
 						<th scope="row"><label for="remote_baseurl"><?php _e('Remote base URL', self::textdomain) ?>
-		                        :</label></th>
+								:</label></th>
 						<td>
 							<input name="remote_baseurl" type="text" class="regular-text" size="60" id="remote_baseurl"
 								   value="<?php echo str_replace(self::$remote_path, '', self::$remote_baseurl); ?>"/>
