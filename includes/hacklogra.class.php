@@ -18,7 +18,7 @@ class hacklogra
 	const opt_key = 'hacklogra_image_to_delete';
 	const opt_space = 'hacklogra_remote_filesize';
 	const opt_primary = 'hacklogra_options';
-	const version = '1.1.1';
+	const version = '1.1.2';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
 	private static $ftp_pwd = 'admin';
@@ -405,7 +405,7 @@ class hacklogra
 	 */
 	public static function upload_images($metadata)
 	{
-		if (!self::is_image_file($file['file']))
+		if (!self::is_image_file($metadata['file']))
 		{
 			return $metadata;
 		}
