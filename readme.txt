@@ -4,7 +4,7 @@ Donate link: http://ihacklog.com/about
 Tags: attachment,manager,admin,image,thumbnail,ftp,remote
 Requires at least: 3.2.1
 Tested up to: 3.2.1
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 
 Adds remote attachments support for your WordPress blog.
 
@@ -71,3 +71,6 @@ added: put index.html to disable directory browsing
 = 1.1.0 =
 handle image file in the later(in HOOK wp_generate_attachment_metadata) for compatibility with watermark plugins
 removed the scheduled hook,now delete the orig image file just after uploaded.
+
+= 1.1.1 =
+fixed a bug,when uploading a non-image file the image upload handler will handle the non-image file.
