@@ -672,7 +672,7 @@ class hacklogra
 						<td>
 							<input name="remote_baseurl" type="text" class="regular-text" size="60" id="remote_baseurl"
 								   value="<?php echo self::get_opt('remote_baseurl'); ?>"/>
-							<span class="description"><?php _e('Remote base URL,the URL to your Ftp root path.for example: <strong>http://www.your-domain.com/</strong>.', self::textdomain) ?></span>
+							<span class="description"><?php _e('Remote base URL,the URL to your Ftp root path.for example: <strong>http://www.your-domain.com</strong>.', self::textdomain) ?></span>
 						</td>
 					</tr>
 					<tr valign="top">
@@ -680,7 +680,7 @@ class hacklogra
 						<td>
 							<input name="remote_path" type="text" class="regular-text" size="60" id="remote_path"
 								   value="<?php echo self::get_opt('remote_path'); ?>"/>
-							<span class="description"><?php _e('the relative path to your FTP main directory.Use "<strong>.</strong>" for FTP main(root) directory.sub-directory Like <strong>wp-files</strong>', self::textdomain) ?></span>
+							<span class="description"><?php _e('the relative path to your FTP main directory.Use "<strong>.</strong>" for FTP main(root) directory.You can use sub-directory Like <strong>wp-files</strong>', self::textdomain) ?></span>
 						</td>
 					</tr>
 				</table>
