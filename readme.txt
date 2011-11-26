@@ -4,7 +4,7 @@ Donate link: http://ihacklog.com/about
 Tags: attachment,manager,admin,image,thumbnail,ftp,remote
 Requires at least: 3.2.1
 Tested up to: 3.2.1
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 
 Adds remote attachments support for your WordPress blog.
 
@@ -76,3 +76,8 @@ removed the scheduled hook,now delete the orig image file just after uploaded.
 fixed a bug,when uploading a non-image file the image upload handler will handle the non-image file. (bug bring in version 1.1.0)
 = 1.1.2 =
 fixed a bug in public static function upload_images(bug bring in version 1.1.1)
+
+= 1.1.3 =
+fixed a bug(when remote path is root directory of FTP server)
+added FTP connection timeout option
+added FTP connection error message returning

@@ -15,15 +15,15 @@ class hacklogra
 {
 	const textdomain = 'hacklog-remote-attachment';
 	const plugin_name = 'Hacklog Remote Attachment';
-	const opt_key = 'hacklogra_image_to_delete';
 	const opt_space = 'hacklogra_remote_filesize';
 	const opt_primary = 'hacklogra_options';
-	const version = '1.1.2';
+	const version = '1.1.3';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
 	private static $ftp_pwd = 'admin';
 	private static $ftp_server = '172.30.16.31';
 	private static $ftp_port = 21;
+	private static $ftp_timeout = 30;
 	private static $subdir = '';
 	private static $remote_path = 'wp-files';
 	private static $remote_url = '';
@@ -66,6 +66,7 @@ class hacklogra
 				$value[$key] = addslashes($_POST[$key]);
 			}
 		}
+		$value['remote_baseurl'] = rtrim($value['remote_baseurl'], '/');
 		$value['remote_path'] = rtrim($value['remote_path'], '/');
 		if (update_option(self::opt_primary, $value))
 			return TRUE;
@@ -107,6 +108,7 @@ class hacklogra
 			'ftp_pwd' => self::$ftp_pwd,
 			'ftp_server' => self::$ftp_server,
 			'ftp_port' => self::$ftp_port,
+			'ftp_timeout' => self::$ftp_timeout,
 			'remote_path' => self::$remote_path,
 			'remote_baseurl' => self::$remote_baseurl,
 		);
@@ -158,6 +160,24 @@ class hacklogra
 		return array('error' => $message);
 	}
 
+	/**
+	 * report upload error
+	 * @return type 
+	 */
+	private static function raise_upload_error()
+	{
+		return call_user_func(array(__CLASS__, 'handle_upload_error'), sprintf('%s:' . __('upload file to remote server failed!', self::textdomain), self::plugin_name));
+	}
+
+	/**
+	 * report FTP connection error
+	 * @return type 
+	 */
+	private static function raise_connection_error()
+	{
+		return call_user_func(array(__CLASS__, 'handle_upload_error'), sprintf('%s:' . self::$fs->errors->get_error_message(), self::plugin_name));
+	}
+
 ############################## PUBLIC FUNCTIONS ##############################################
 	/**
 	 * init
@@ -174,22 +194,22 @@ class hacklogra
 		self::$ftp_pwd = $opts['ftp_pwd'];
 		self::$ftp_server = $opts['ftp_server'];
 		self::$ftp_port = $opts['ftp_port'];
-		self::$remote_path = $opts['remote_path'];
-		self::$remote_baseurl = $opts['remote_baseurl'];
+		self::$ftp_timeout = $opts['ftp_timeout'] > 0 ? $opts['ftp_timeout'] : 30;
 
 		$opts['remote_path'] = rtrim($opts['remote_path'], '/');
-		$opts['remote_baseurl'] = rtrim($opts['remote_baseurl'], '/') . '/';
+		$opts['remote_baseurl'] = rtrim($opts['remote_baseurl'], '/');
 		$upload_dir = wp_upload_dir();
-
 		//be aware of / in the end
 		self::$local_basepath = $upload_dir['basedir'];
 		self::$local_path = $upload_dir['path'];
 		self::$local_baseurl = $upload_dir['baseurl'];
 		self::$local_url = $upload_dir['url'];
 		self::$subdir = $upload_dir['subdir'];
+		//后面不带 /
 		self::$remote_path = $opts['remote_path'];
 		//此baseurl与options里面的不同！
-		self::$remote_baseurl = $opts['remote_baseurl'] . self::$remote_path;
+		self::$remote_baseurl = '.' == self::$remote_path ? $opts['remote_baseurl'] :
+				$opts['remote_baseurl'] . '/' . self::$remote_path;
 		self::$remote_url = self::$remote_baseurl . self::$subdir;
 	}
 
@@ -203,9 +223,6 @@ class hacklogra
 		add_option(self::opt_space, 0);
 		$opt_primary = self::get_default_opts();
 		add_option(self::opt_primary, $opt_primary);
-		//clear the data generate by previous version 1.0.2
-		delete_option(self::opt_key);
-		wp_clear_scheduled_hook('delete_orig_picture_hourly');
 	}
 
 	/**
@@ -217,6 +234,12 @@ class hacklogra
 	{
 		//delete_option(self::opt_space);
 		delete_option(self::opt_primary);
+	}
+
+	private static function get_opt($key, $defaut='')
+	{
+		$opts = get_option(self::opt_primary);
+		return isset($opts[$key]) ? $opts[$key] : $defaut;
 	}
 
 	/**
@@ -267,7 +290,7 @@ class hacklogra
 		self::$fs = new $method($args);
 		//Define the timeouts for the connections. Only available after the construct is called to allow for per-transport overriding of the default.
 		if (!defined('FS_CONNECT_TIMEOUT'))
-			define('FS_CONNECT_TIMEOUT', 30);
+			define('FS_CONNECT_TIMEOUT', self::$ftp_timeout);
 		if (!defined('FS_TIMEOUT'))
 			define('FS_TIMEOUT', 30);
 
@@ -276,6 +299,8 @@ class hacklogra
 
 		if (!self::$fs->connect())
 			return false; //There was an erorr connecting to the server.
+
+
 
 
 
@@ -347,12 +372,11 @@ class hacklogra
 	 */
 	public static function upload_and_send($file)
 	{
-		self::connect_remote_server();
+		if (!self::connect_remote_server())
+		{
+			return self::raise_connection_error();
+		}
 		$upload_error_handler = 'wp_handle_upload_error';
-//		if ( self::$fs->errors instanceof WP_Error)
-//		{
-//			return call_user_func(array(__CLASS__,'handle_upload_error'), sprintf('%s:' .self::$fs->errors->get_error_message(), self::plugin_name));
-//		}
 
 		$local_basename = basename($file['file']);
 		$localfile = $file['file'];
@@ -374,7 +398,7 @@ class hacklogra
 			}
 			if (!self::$fs->is_dir($remote_subdir))
 			{
-				return call_user_func($upload_error_handler, &$file, sprintf('%s:' . __('failed to make dir on remote server!Pleas check your FTP <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank">file permissions</a>', self::textdomain), self::plugin_name));
+				return call_user_func($upload_error_handler, &$file, sprintf('%s:' . __('failed to make dir on remote server!Please check your FTP permissions.', self::textdomain), self::plugin_name));
 			}
 		}
 		//如果是图片，此处不处理，因为要与水印插件兼容的原因　
@@ -409,9 +433,10 @@ class hacklogra
 		{
 			return $metadata;
 		}
+
 		if (!self::connect_remote_server())
 		{
-			return $metadata;
+			return self::raise_connection_error();
 		}
 
 		//deal with fullsize image file
@@ -429,15 +454,6 @@ class hacklogra
 			}
 		}
 		return $metadata;
-	}
-
-	/**
-	 * report upload error
-	 * @return type 
-	 */
-	private static function raise_upload_error()
-	{
-		return array('error' => sprintf('%s:' . __('upload file to remote server failed!', self::textdomain), self::plugin_name));
 	}
 
 	/**
@@ -514,7 +530,7 @@ class hacklogra
 	 */
 	public static function plugin_menu()
 	{
-		add_options_page(__('Hacklog Remote Attachment Options', self::textdomain), __('Hacklog Remote Attachment', self::textdomain), 'manage_options', HACKLOG_RA_LOADER, array(__CLASS__, 'plugin_options')
+		add_options_page(__('Hacklog Remote Attachment Options', self::textdomain), __('Remote Attachment', self::textdomain), 'manage_options', HACKLOG_RA_LOADER, array(__CLASS__, 'plugin_options')
 		);
 	}
 
@@ -611,7 +627,7 @@ class hacklogra
 						<th scope="row"><label for="ftp_server"><?php _e('Ftp server', self::textdomain) ?>:</label></th>
 						<td>
 							<input name="ftp_server" type="text" class="regular-text" size="100" id="ftp_server"
-								   value="<?php echo self::$ftp_server; ?>"/>
+								   value="<?php echo self::get_opt('ftp_server'); ?>"/>
 							<span class="description"><?php _e('the IP or domain name of remote file server.', self::textdomain) ?></span>
 						</td>
 					</tr>
@@ -619,7 +635,7 @@ class hacklogra
 						<th scope="row"><label for="ftp_port"><?php _e('Ftp server port', self::textdomain) ?>:</label></th>
 						<td>
 							<input name="ftp_port" type="text" class="small-text" size="60" id="ftp_port"
-								   value="<?php echo self::$ftp_port; ?>"/>
+								   value="<?php echo self::get_opt('ftp_port'); ?>"/>
 							<span class="description"><?php _e('the listenning port of remote FTP server.', self::textdomain) ?></span>
 						</td>
 					</tr>
@@ -628,7 +644,7 @@ class hacklogra
 						<th scope="row"><label for="ftp_user"><?php _e('Ftp username', self::textdomain) ?>:</label></th>
 						<td>
 							<input name="ftp_user" type="text" class="regular-text" size="60" id="ftp_user"
-								   value="<?php echo self::$ftp_user; ?>"/>
+								   value="<?php echo self::get_opt('ftp_user'); ?>"/>
 							<span class="description"><?php _e('the Ftp username.', self::textdomain) ?></span>
 						</td>
 					</tr>
@@ -637,8 +653,16 @@ class hacklogra
 						<th scope="row"><label for="ftp_pwd"><?php _e('Ftp password', self::textdomain) ?>:</label></th>
 						<td>
 							<input name="ftp_pwd" type="password" class="regular-text" size="60" id="ftp_pwd"
-								   value="<?php echo self::$ftp_pwd; ?>"/>
+								   value="<?php echo self::get_opt('ftp_pwd'); ?>"/>
 							<span class="description"><?php _e('the password.', self::textdomain) ?></span>
+						</td>
+					</tr>
+					<tr valign="top">
+						<th scope="row"><label for="ftp_timeout"><?php _e('Ftp timeout', self::textdomain) ?>:</label></th>
+						<td>
+							<input name="ftp_timeout" type="text" class="small-text" size="30" id="ftp_timeout"
+								   value="<?php echo self::get_opt('ftp_timeout'); ?>"/>
+							<span class="description"><?php _e('FTP connection timeout.', self::textdomain) ?></span>
 						</td>
 					</tr>
 
@@ -647,7 +671,7 @@ class hacklogra
 								:</label></th>
 						<td>
 							<input name="remote_baseurl" type="text" class="regular-text" size="60" id="remote_baseurl"
-								   value="<?php echo str_replace(self::$remote_path, '', self::$remote_baseurl); ?>"/>
+								   value="<?php echo self::get_opt('remote_baseurl'); ?>"/>
 							<span class="description"><?php _e('Remote base URL,the URL to your Ftp root path.for example: <strong>http://www.your-domain.com/</strong>.', self::textdomain) ?></span>
 						</td>
 					</tr>
@@ -655,8 +679,8 @@ class hacklogra
 						<th scope="row"><label for="remote_path"><?php _e('Remote path', self::textdomain) ?>:</label></th>
 						<td>
 							<input name="remote_path" type="text" class="regular-text" size="60" id="remote_path"
-								   value="<?php echo self::$remote_path; ?>"/>
-							<span class="description"><?php _e('the sub dir.Like <strong>wp-files</strong>', self::textdomain) ?></span>
+								   value="<?php echo self::get_opt('remote_path'); ?>"/>
+							<span class="description"><?php _e('the relative path to your FTP main directory.Use "<strong>.</strong>" for FTP main(root) directory.sub-directory Like <strong>wp-files</strong>', self::textdomain) ?></span>
 						</td>
 					</tr>
 				</table>
@@ -671,19 +695,19 @@ class hacklogra
 			<h2> <?php _e('Hacklog Remote Attachment Status', self::textdomain) ?></h2>
 
 			<p style="color:#999999;font-size:14px;">
-		<?php _e('Space used on remote server:', self::textdomain); ?><?php echo self::human_size(get_option(hacklogra::opt_space)); ?>
+				<?php _e('Space used on remote server:', self::textdomain); ?><?php echo self::human_size(get_option(hacklogra::opt_space)); ?>
 			</p>
 			<hr/>
 			<h2>Tools</h2>
 
 			<p style="color:#f00;font-size:14px;"><strong><?php _e('warning:', self::textdomain); ?></strong>
-		<?php _e("if you haven't moved all your attachments OR dont't know what below means,please <strong>DO NOT</strong> click the link below!", self::textdomain); ?>
+				<?php _e("if you haven't moved all your attachments OR dont't know what below means,please <strong>DO NOT</strong> click the link below!", self::textdomain); ?>
 			</p>
 
 			<h3><?php _e('Move', self::textdomain); ?></h3>
 
 			<p style="color:#4e9a06;font-size:14px;">
-		<?php _e('if you have moved all your attachments to the remote server,then you can click', self::textdomain); ?>
+				<?php _e('if you have moved all your attachments to the remote server,then you can click', self::textdomain); ?>
 				<a onclick="return confirm('<?php _e('Are your sure to do this?Make sure you have backuped your database tables.', self::textdomain); ?>');"
 				   href="<?php echo admin_url('options-general.php?page=' . plugin_basename(HACKLOG_RA_LOADER)); ?>&hacklog_do=replace_old_post_attach_url"><strong><?php _e('here', self::textdomain); ?></strong></a><?php _e(' to update the database.', self::textdomain); ?>
 			</p>
@@ -691,7 +715,7 @@ class hacklogra
 			<h3><?php _e('Recovery', self::textdomain); ?></h3>
 
 			<p style="color:#4e9a06;font-size:14px;">
-		<?php _e('if you have moved all your attachments from the remote server to local server,then you can click', self::textdomain); ?>
+				<?php _e('if you have moved all your attachments from the remote server to local server,then you can click', self::textdomain); ?>
 				<a onclick="return confirm('<?php _e('Are your sure to do this?Make sure you have backuped your database tables.', self::textdomain); ?>');"
 				   href="<?php echo admin_url('options-general.php?page=' . plugin_basename(HACKLOG_RA_LOADER)); ?>&hacklog_do=recovery_post_attach_url"><strong><?php _e('here', self::textdomain); ?></strong></a><?php _e(' to update the database.', self::textdomain); ?>
 			</p>
