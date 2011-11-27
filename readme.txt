@@ -98,3 +98,6 @@ Simplified Chinese(zh_CN) language po and mo files. By [荒野无灯](http://iha
  
 = 1.1.5 =
 * fixed: when no thumbnails,do not run foreach in function upload_images
+
+= 1.1.6 =
+* fixed: change upload file permission to 0744 
