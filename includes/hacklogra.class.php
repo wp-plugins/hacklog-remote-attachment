@@ -17,7 +17,7 @@ class hacklogra
 	const plugin_name = 'Hacklog Remote Attachment';
 	const opt_space = 'hacklogra_remote_filesize';
 	const opt_primary = 'hacklogra_options';
-	const version = '1.1.4';
+	const version = '1.1.5';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
 	private static $ftp_pwd = 'admin';
@@ -310,6 +310,8 @@ class hacklogra
 
 
 
+
+
 			
 // Set the permission constants if not already set.
 		if (!defined('FS_CHMOD_DIR'))
@@ -453,12 +455,15 @@ class hacklogra
 			return self::raise_upload_error();
 		}
 
-		foreach ($metadata['sizes'] as $image_size => $image_item)
+		if (isset($metadata['sizes']) && count($metadata['sizes']) > 0)
 		{
-			$relative_filepath = dirname($metadata['file']) . DIRECTORY_SEPARATOR . $metadata['sizes'][$image_size]['file'];
-			if (!self::upload_file($relative_filepath))
+			foreach ($metadata['sizes'] as $image_size => $image_item)
 			{
-				return self::raise_upload_error();
+				$relative_filepath = dirname($metadata['file']) . DIRECTORY_SEPARATOR . $metadata['sizes'][$image_size]['file'];
+				if (!self::upload_file($relative_filepath))
+				{
+					return self::raise_upload_error();
+				}
 			}
 		}
 		return $metadata;

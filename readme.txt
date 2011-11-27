@@ -96,3 +96,5 @@ Simplified Chinese(zh_CN) language po and mo files. By [荒野无灯](http://iha
 * changed remote path to FTP remote path and added HTTP remote path to support the mapping relationship between FTP remote path and HTTP remote path
 * fixed:when connection failed,delete the file on local server.
  
+= 1.1.5 =
+* fixed: when no thumbnails,do not run foreach in function upload_images
