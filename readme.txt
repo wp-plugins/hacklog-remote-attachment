@@ -10,8 +10,10 @@ Adds remote attachments support for your WordPress blog.
 
 == Description ==
 Features: Adds remote attachments support for your WordPress blog.
+
 use this plugin, you can upload any files to remote ftp servers(be aware that your FTP server must has Apache or other HTTP server daemon) in WordPress.
-*Support both single user site AND multisite.
+
+* Support both single user site AND multisite.
 * support upload files to remote FTP server.
 * support delete files on remote FTP server.
 * works just like the files are saved on your local server-_-.
@@ -19,16 +21,24 @@ use this plugin, you can upload any files to remote ftp servers(be aware that yo
 * you can move local server files to remote server if you'd like to do so.
 
 For MORE information,please visit the [plugin homepage](http://ihacklog.com/?p=5001 "plugin homepage") for any questions about the plugin.
+
 [installation guide](http://ihacklog.com/?p=4993 "installation guide") 
+
 version 1.1.0 added compatibility with watermark plugins
+
 Simplified Chinese(zh_CN) language po and mo files. By [荒野无灯](http://ihacklog.com "荒野无灯weblog") @  荒野无灯weblog 
 
 目前有中、英文两种语言。
 更多信息请访问[插件主页](http://ihacklog.com/?p=5001 "plugin homepage") 获取关于插件的更多信息，使用技巧等.
+
 简体中文语言包(zh_CN) po 和 mo 文件由 [荒野无灯](http://ihacklog.com "荒野无灯weblog") @  荒野无灯weblog 提供。
+
 1.0.2 增加自动创建远程目录功能。解决在某些FTP服务器出现“在远程服务器创建目录失败”的问题。
+
 [安装指导](http://ihacklog.com/?p=4993 "安装指导") 
+
 1.1.0 增加与水印插件的兼容性，使上传到远程服务器的图片同样可以加上水印
+
 
 == Installation ==
 
@@ -59,25 +69,30 @@ Simplified Chinese(zh_CN) language po and mo files. By [荒野无灯](http://iha
 == Changelog ==
 
 = 1.0.0 =
-released the first version.
+* released the first version.
 
 = 1.0.1 =
-fixed a small bug(cron delete).
+* fixed a small bug(cron delete).
 
 = 1.0.2 =
-added: remote direcotry auto-make functions.If the remote dir does not exists,the plugin will try to make it.
-added: put index.html to disable directory browsing
+* added: remote direcotry auto-make functions.If the remote dir does not exists,the plugin will try to make it.
+* added: put index.html to disable directory browsing
 
 = 1.1.0 =
-handle image file in the later(in HOOK wp_generate_attachment_metadata) for compatibility with watermark plugins
-removed the scheduled hook,now delete the orig image file just after uploaded.
+* handle image file in the later(in HOOK wp_generate_attachment_metadata) for compatibility with watermark plugins
+* removed the scheduled hook,now delete the orig image file just after uploaded.
 
 = 1.1.1 =
-fixed a bug,when uploading a non-image file the image upload handler will handle the non-image file. (bug bring in version 1.1.0)
+* fixed a bug,when uploading a non-image file the image upload handler will handle the non-image file. (bug bring in version 1.1.0)
 = 1.1.2 =
-fixed a bug in public static function upload_images(bug bring in version 1.1.1)
+* fixed a bug in public static function upload_images(bug bring in version 1.1.1)
 
 = 1.1.3 =
-fixed a bug(when remote path is root directory of FTP server)
-added FTP connection timeout option
-added FTP connection error message returning
+* fixed a bug(when remote path is root directory of FTP server)
+* added FTP connection timeout option
+* added FTP connection error message returning
+
+= 1.1.4 =
+* changed remote path to FTP remote path and added HTTP remote path to support the mapping relationship between FTP remote path and HTTP remote path
+* fixed:when connection failed,delete the file on local server.
+ 
