@@ -393,7 +393,7 @@ class hacklogra
 			$dir_needs = '';
 			while (isset($subdir[$i]) && !empty($subdir[$i])) {
 				$dir_needs .= $subdir[$i] . '/';
-				!self::$fs->is_dir($dir_needs) && self::$fs->mkdir($dir_needs, 0777);
+				!self::$fs->is_dir($dir_needs) && self::$fs->mkdir($dir_needs, 0755);
 				//disable directory browser
 				!self::$fs->is_file($dir_needs . 'index.html') && self::$fs->put_contents($dir_needs . 'index.html', 'Silence is golden.');
 				++$i;
