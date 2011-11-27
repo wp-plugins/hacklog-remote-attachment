@@ -305,14 +305,6 @@ class hacklogra
 		if (!self::$fs->connect())
 			return false; //There was an erorr connecting to the server.
 
-
-
-
-
-
-
-
-			
 // Set the permission constants if not already set.
 		if (!defined('FS_CHMOD_DIR'))
 			define('FS_CHMOD_DIR', 0755);
