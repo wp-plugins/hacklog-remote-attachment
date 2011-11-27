@@ -410,7 +410,7 @@ class hacklogra
 		}
 		$content = file_get_contents($localfile);
 		//        return array('error'=> $remotefile);
-		if (!self::$fs->put_contents($remotefile, $content,0744))
+		if (!self::$fs->put_contents($remotefile, $content,0644))
 		{
 			return call_user_func($upload_error_handler, &$file, sprintf('%s:' . __('upload file to remote server failed!', self::textdomain), self::plugin_name));
 		}
@@ -472,7 +472,7 @@ class hacklogra
 		$local_basename = basename($local_filepath);
 		$remotefile = self::$ftp_remote_path . self::$subdir . '/' . $local_basename;
 		$file_data = file_get_contents($local_filepath);
-		if (!self::$fs->put_contents($remotefile, $file_data,0744))
+		if (!self::$fs->put_contents($remotefile, $file_data,0644))
 		{
 			return FALSE;
 		}
