@@ -209,6 +209,22 @@ class hacklogra
 		self::$local_baseurl = $upload_dir['baseurl'];
 		self::$local_url = $upload_dir['url'];
 		self::$subdir = $upload_dir['subdir'];
+		//if the post publish date was different from the media upload date,the time should take from the database.
+		if (get_option('uploads_use_yearmonth_folders') && isset( $_REQUEST['post_id'] ))
+		{
+			$post_id = (int) $_REQUEST['post_id'];
+			if ($post = get_post($post_id))
+			{
+				if (substr($post->post_date, 0, 4) > 0)
+				{
+					$time = $post->post_date;
+					$y = substr($time, 0, 4);
+					$m = substr($time, 5, 2);
+					$subdir = "/$y/$m";
+					self::$subdir = $subdir;
+				}
+			}
+		}
 		//后面不带 /
 		self::$ftp_remote_path = $opts['ftp_remote_path'];
 		self::$http_remote_path = $opts['http_remote_path'];
@@ -305,6 +321,8 @@ class hacklogra
 		if (!self::$fs->connect())
 			return false; //There was an erorr connecting to the server.
 
+
+			
 // Set the permission constants if not already set.
 		if (!defined('FS_CHMOD_DIR'))
 			define('FS_CHMOD_DIR', 0755);
@@ -410,7 +428,7 @@ class hacklogra
 		}
 		$content = file_get_contents($localfile);
 		//        return array('error'=> $remotefile);
-		if (!self::$fs->put_contents($remotefile, $content,0644))
+		if (!self::$fs->put_contents($remotefile, $content, 0644))
 		{
 			return call_user_func($upload_error_handler, &$file, sprintf('%s:' . __('upload file to remote server failed!', self::textdomain), self::plugin_name));
 		}
@@ -472,7 +490,7 @@ class hacklogra
 		$local_basename = basename($local_filepath);
 		$remotefile = self::$ftp_remote_path . self::$subdir . '/' . $local_basename;
 		$file_data = file_get_contents($local_filepath);
-		if (!self::$fs->put_contents($remotefile, $file_data,0644))
+		if (!self::$fs->put_contents($remotefile, $file_data, 0644))
 		{
 			return FALSE;
 		}

@@ -4,7 +4,7 @@ Donate link: http://ihacklog.com/about
 Tags: attachment,manager,admin,image,thumbnail,ftp,remote
 Requires at least: 3.2.1
 Tested up to: 3.2.1
-Stable tag: 1.1.5
+Stable tag: 1.1.6
 
 Adds remote attachments support for your WordPress blog.
 
@@ -101,3 +101,4 @@ Simplified Chinese(zh_CN) language po and mo files. By [荒野无灯](http://iha
 
 = 1.1.6 =
 * fixed: changed upload file permission to 0644 ,changed created directory permission to 0755
+* fixed: get the right subdir when the post publish date was different from the media upload date.
