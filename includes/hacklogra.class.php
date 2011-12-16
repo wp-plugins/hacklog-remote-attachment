@@ -17,7 +17,7 @@ class hacklogra
 	const plugin_name = 'Hacklog Remote Attachment';
 	const opt_space = 'hacklogra_remote_filesize';
 	const opt_primary = 'hacklogra_options';
-	const version = '1.2.0';
+	const version = '1.2.1';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
 	private static $ftp_pwd = 'admin';
@@ -38,20 +38,16 @@ class hacklogra
 	public function __construct()
 	{
 		self::init();
-		add_filter('wp_handle_upload', array(__CLASS__, 'upload_and_send'));
-		add_filter('media_send_to_editor', array(__CLASS__, 'replace_attachurl'), -999);
-		add_filter('attachment_link', array(__CLASS__, 'replace_baseurl'), -999);
-		//生成缩略图后立即上传生成的文件并删除本地文件,this must after watermark generate
-		add_filter('wp_generate_attachment_metadata', array(__CLASS__, 'upload_images'), 999);
-		//删除远程附件
-		add_action('wp_delete_file', array(__CLASS__, 'delete_remote_file'));
-		//menu
-		add_action('admin_menu', array(__CLASS__, 'plugin_menu'));
+		//this should always check
+		add_action('admin_notices', array(__CLASS__, 'check_ftp_connection'));
 		//should load before 'admin_menu' hook ... so,use init hook  
 		add_action('init', array(__CLASS__, 'load_textdomain'));
+		//menu
+		add_action('admin_menu', array(__CLASS__, 'plugin_menu'));
+		//HOOK the upload
+		add_action('admin_init', array(__CLASS__, 'admin_init'));
 		//frontend filter,filter on image only
 		add_filter('wp_get_attachment_url', array(__CLASS__, 'replace_baseurl'), -999);
-		add_action('admin_notices', array(__CLASS__, 'check_ftp_connection'));
 	}
 
 ############################## PRIVATE FUNCTIONS ##############################################
@@ -284,7 +280,36 @@ class hacklogra
 	 */
 	public static function load_textdomain()
 	{
-		load_plugin_textdomain('hacklog-remote-attachment', false, dirname(plugin_basename(HACKLOG_RA_LOADER)) . '/languages/');
+		load_plugin_textdomain(self::textdomain, false, dirname(plugin_basename(HACKLOG_RA_LOADER)) . '/languages/');
+	}
+
+	/**
+	 * @since 1.2.1
+	 * note that admin_menu runs before admin_init
+	 */
+	public static function admin_init()
+	{
+		//DO NOT HOOK the update or upgrade page for that they may upload zip file.
+		$current_page = basename($_SERVER['SCRIPT_FILENAME']);
+		switch ($current_page)
+		{
+			//	wp-admin/update.php?action=upload-plugin
+			//	wp-admin/update.php?action=upload-theme
+			case 'update.php':
+			//update-core.php?action=do-core-reinstall
+			case 'update-core.php':
+				//JUST DO NOTHING ,SKIP.
+				break;
+			default:
+				add_filter('wp_handle_upload', array(__CLASS__, 'upload_and_send'));
+				add_filter('media_send_to_editor', array(__CLASS__, 'replace_attachurl'), -999);
+				add_filter('attachment_link', array(__CLASS__, 'replace_baseurl'), -999);
+				//生成缩略图后立即上传生成的文件并删除本地文件,this must after watermark generate
+				add_filter('wp_generate_attachment_metadata', array(__CLASS__, 'upload_images'), 999);
+				//删除远程附件
+				add_action('wp_delete_file', array(__CLASS__, 'delete_remote_file'));
+				break;
+		}
 	}
 
 	/**
@@ -320,6 +345,7 @@ class hacklogra
 
 		if (!self::$fs->connect())
 			return false; //There was an erorr connecting to the server.
+
 
 
 
@@ -417,16 +443,16 @@ class hacklogra
 		$upload_error_handler = 'wp_handle_upload_error';
 
 		$local_basename = basename($file['file']);
-		$local_basename_unique = self::unique_filename(self::$ftp_remote_path . self::$subdir , $local_basename);
+		$local_basename_unique = self::unique_filename(self::$ftp_remote_path . self::$subdir, $local_basename);
 		/**
-		 *since we can not detect wether remote file is duplicated or not.
+		 * since we can not detect wether remote file is duplicated or not.
 		 * if remote already has the file,then first rename local filename to target.after this,the file uploaded to remote
 		 * server should not overwrote the existed file.
 		 */
-		if( $local_basename_unique != $local_basename )
+		if ($local_basename_unique != $local_basename)
 		{
 			$local_full_filename = dirname($file['file']) . '/' . $local_basename_unique;
-			rename($file['file'], $local_full_filename );
+			rename($file['file'], $local_full_filename);
 			$file['file'] = $local_full_filename;
 		}
 		$localfile = $file['file'];
@@ -537,7 +563,7 @@ class hacklogra
 
 	/**
 	 * Get a filename that is sanitized and unique for the given directory.
-	 *@uses self::$fs ,make sure the FTP connection is available when you use this method!
+	 * @uses self::$fs ,make sure the FTP connection is available when you use this method!
 	 * @since 1.2.0
 	 * @param string $dir the remote dir
 	 * @param string $filename the base filename
@@ -568,8 +594,7 @@ class hacklogra
 			$filename2 = preg_replace('|' . preg_quote($ext) . '$|', $ext2, $filename);
 
 			// check for both lower and upper case extension or image sub-sizes may be overwritten
-			while (self::$fs->is_file($dir . "/$filename") || self::$fs->is_file($dir . "/$filename2")) 
-			{
+			while (self::$fs->is_file($dir . "/$filename") || self::$fs->is_file($dir . "/$filename2")) {
 				$new_number = $number + 1;
 				$filename = str_replace("$number$ext", "$new_number$ext", $filename);
 				$filename2 = str_replace("$number$ext2", "$new_number$ext2", $filename2);
@@ -578,8 +603,7 @@ class hacklogra
 			return $filename2;
 		}
 
-		while (self::$fs->is_file($dir . "/$filename"))
-		{
+		while (self::$fs->is_file($dir . "/$filename")) {
 			if ('' == "$number$ext")
 				$filename = $filename . ++$number . $ext;
 			else
@@ -732,7 +756,7 @@ class hacklogra
 		}
 		?>
 		<div class="wrap">
-			<?php screen_icon(); ?>
+		<?php screen_icon(); ?>
 			<h2> <?php _e('Hacklog Remote Attachment Options', self::textdomain) ?></h2>
 			<?php
 			self::show_message($msg, 'm');
@@ -821,19 +845,19 @@ class hacklogra
 			<h2> <?php _e('Hacklog Remote Attachment Status', self::textdomain); ?></h2>
 
 			<p style="color:#999999;font-size:14px;">
-				<?php _e('Space used on remote server:', self::textdomain); ?><?php echo self::human_size(get_option(hacklogra::opt_space)); ?>
+		<?php _e('Space used on remote server:', self::textdomain); ?><?php echo self::human_size(get_option(hacklogra::opt_space)); ?>
 			</p>
 			<hr/>
 			<h2>Tools</h2>
 
 			<p style="color:#f00;font-size:14px;"><strong><?php _e('warning:', self::textdomain); ?></strong>
-				<?php _e("if you haven't moved all your attachments OR dont't know what below means,please <strong>DO NOT</strong> click the link below!", self::textdomain); ?>
+		<?php _e("if you haven't moved all your attachments OR dont't know what below means,please <strong>DO NOT</strong> click the link below!", self::textdomain); ?>
 			</p>
 
 			<h3><?php _e('Move', self::textdomain); ?></h3>
 
 			<p style="color:#4e9a06;font-size:14px;">
-				<?php _e('if you have moved all your attachments to the remote server,then you can click', self::textdomain); ?>
+		<?php _e('if you have moved all your attachments to the remote server,then you can click', self::textdomain); ?>
 				<a onclick="return confirm('<?php _e('Are your sure to do this?Make sure you have backuped your database tables.', self::textdomain); ?>');"
 				   href="<?php echo admin_url('options-general.php?page=' . plugin_basename(HACKLOG_RA_LOADER)); ?>&hacklog_do=replace_old_post_attach_url"><strong><?php _e('here', self::textdomain); ?></strong></a><?php _e(' to update the database.', self::textdomain); ?>
 			</p>
@@ -841,7 +865,7 @@ class hacklogra
 			<h3><?php _e('Recovery', self::textdomain); ?></h3>
 
 			<p style="color:#4e9a06;font-size:14px;">
-				<?php _e('if you have moved all your attachments from the remote server to local server,then you can click', self::textdomain); ?>
+		<?php _e('if you have moved all your attachments from the remote server to local server,then you can click', self::textdomain); ?>
 				<a onclick="return confirm('<?php _e('Are your sure to do this?Make sure you have backuped your database tables.', self::textdomain); ?>');"
 				   href="<?php echo admin_url('options-general.php?page=' . plugin_basename(HACKLOG_RA_LOADER)); ?>&hacklog_do=recovery_post_attach_url"><strong><?php _e('here', self::textdomain); ?></strong></a><?php _e(' to update the database.', self::textdomain); ?>
 			</p>
