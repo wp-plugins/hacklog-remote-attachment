@@ -2,7 +2,7 @@
 Contributors: ihacklog
 Donate link: http://ihacklog.com/donate
 Tags: attachment,manager,admin,images,thumbnail,ftp,remote
-Requires at least: 3.2.1
+Requires at least: 3.3
 Tested up to: 3.3
 Stable tag: 1.2.1
 
