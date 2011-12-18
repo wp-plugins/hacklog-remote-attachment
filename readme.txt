@@ -4,7 +4,7 @@ Donate link: http://ihacklog.com/donate
 Tags: attachment,manager,admin,images,thumbnail,ftp,remote
 Requires at least: 3.3
 Tested up to: 3.3
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 
 Adds remote attachments support for your WordPress blog.
 
@@ -64,6 +64,8 @@ You can visit [plugin homepage](http://ihacklog.com/?p=5001 "plugin homepage") f
 
 
 == Changelog ==
+= 1.2.2 =
+* fixed: DO NOT delete the options when the plugin is deactivating.
 
 = 1.2.1 =
 * fixed the bug when uploading new theme or plugin this plugin may cause it to fail.

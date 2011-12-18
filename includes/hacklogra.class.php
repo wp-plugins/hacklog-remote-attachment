@@ -17,7 +17,7 @@ class hacklogra
 	const plugin_name = 'Hacklog Remote Attachment';
 	const opt_space = 'hacklogra_remote_filesize';
 	const opt_primary = 'hacklogra_options';
-	const version = '1.2.1';
+	const version = '1.2.2';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
 	private static $ftp_pwd = 'admin';
@@ -250,7 +250,7 @@ class hacklogra
 	public static function my_deactivation()
 	{
 		//delete_option(self::opt_space);
-		delete_option(self::opt_primary);
+		//delete_option(self::opt_primary);
 	}
 
 	private static function get_opt($key, $defaut='')
