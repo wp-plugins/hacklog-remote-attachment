@@ -396,7 +396,7 @@ class hacklogra
 			if (!self::connect_remote_server())
 			{
 				$error = self::raise_connection_error();
-				$redirect_msg = sprintf(__('Click <a href="%s">here</a> to setup the plugin options.'), admin_url('options-general.php?page=' . md5(HACKLOG_RA_LOADER)));
+				$redirect_msg = sprintf(__('Click <a href="%s">here</a> to setup the plugin options.',self::textdomain), admin_url('options-general.php?page=' . md5(HACKLOG_RA_LOADER)));
 				echo '<div class="error"><p><strong>' . $error['error'] . '<br />' . $redirect_msg . '</strong></p></div>';
 			}
 		}
