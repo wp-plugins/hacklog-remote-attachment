@@ -55,7 +55,7 @@ class hacklogra
 	{
 		if( !class_exists('Crypt') )
 		{
-			require dirname(__FILE__). '/Crypt.class.php';
+			require dirname(__FILE__). '/crypt.class.php';
 		}
 		$cypher = new Crypt(Crypt::CRYPT_MODE_HEXADECIMAL,Crypt::CRYPT_HASH_SHA1);
 		$cypher->Key = AUTH_KEY;		
@@ -66,7 +66,7 @@ class hacklogra
 	{
 		if( !class_exists('Crypt') )
 		{
-			require dirname(__FILE__). '/Crypt.class.php';
+			require dirname(__FILE__). '/crypt.class.php';
 		}
 		$cypher = new Crypt(Crypt::CRYPT_MODE_HEXADECIMAL,Crypt::CRYPT_HASH_SHA1);
 		$cypher->Key = AUTH_KEY;
@@ -349,7 +349,7 @@ class hacklogra
 		//ftpext or ftpsockets
 		//if php has enabled ftp module ,use it ,else ,uses sockets API
 		$method = function_exists('ftp_login') ? 'ftpext' : 'ftpsockets';
-		if (!class_exists("WP_Filesystem_{$method}"))
+		if (!class_exists("WP_Filesystem_$method"))
 		{
 			$abstraction_file = ABSPATH . 'wp-admin/includes/class-wp-filesystem-' . $method . '.php';
 			if (!file_exists($abstraction_file))
@@ -358,7 +358,7 @@ class hacklogra
 			}
 			require_once($abstraction_file);
 		}
-		$method = "WP_Filesystem_{$method}";
+		$method = "WP_Filesystem_$method";
 		self::$fs = new $method($args);
 		//Define the timeouts for the connections. Only available after the construct is called to allow for per-transport overriding of the default.
 		if (!defined('FS_CONNECT_TIMEOUT'))
