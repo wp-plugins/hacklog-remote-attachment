@@ -17,7 +17,7 @@ class hacklogra
 	const plugin_name = 'Hacklog Remote Attachment';
 	const opt_space = 'hacklogra_remote_filesize';
 	const opt_primary = 'hacklogra_options';
-	const version = '1.2.2';
+	const version = '1.2.3';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
 	private static $ftp_pwd = 'admin';
@@ -51,7 +51,28 @@ class hacklogra
 	}
 
 ############################## PRIVATE FUNCTIONS ##############################################
-
+	private static function encrypt($plain_text )
+	{
+		if( !class_exists('Crypt') )
+		{
+			require dirname(__FILE__). '/Crypt.class.php';
+		}
+		$cypher = new Crypt(Crypt::CRYPT_MODE_HEXADECIMAL,Crypt::CRYPT_HASH_SHA1);
+		$cypher->Key = AUTH_KEY;		
+		return $cypher->encrypt($plain_text);
+	}
+	
+	private static function decrypt($encrypted )
+	{
+		if( !class_exists('Crypt') )
+		{
+			require dirname(__FILE__). '/Crypt.class.php';
+		}
+		$cypher = new Crypt(Crypt::CRYPT_MODE_HEXADECIMAL,Crypt::CRYPT_HASH_SHA1);
+		$cypher->Key = AUTH_KEY;
+		return $cypher->decrypt( $encrypted );
+	}
+	
 	private static function update_options()
 	{
 		$value = self::get_default_opts();
@@ -60,7 +81,11 @@ class hacklogra
 		{
 			if (!empty($_POST[$key]))
 			{
-				$value[$key] = addslashes($_POST[$key]);
+				$value[$key] = addslashes(trim($_POST[$key]));
+				if( 'ftp_pwd' == $key)
+				{
+					$value[$key] = self::encrypt($value[$key]);
+				}
 			}
 		}
 		$value['remote_baseurl'] = rtrim($value['remote_baseurl'], '/');
@@ -280,7 +305,7 @@ class hacklogra
 	 */
 	public static function load_textdomain()
 	{
-		load_plugin_textdomain(self::textdomain, false, dirname(plugin_basename(HACKLOG_RA_LOADER)) . '/languages/');
+		load_plugin_textdomain(self::textdomain, false, basename(dirname(HACKLOG_RA_LOADER)) . '/languages/');
 	}
 
 	/**
@@ -322,8 +347,9 @@ class hacklogra
 	{
 		require_once(ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php');
 		//ftpext or ftpsockets
-		$method = 'ftpext';
-		if (!class_exists("WP_Filesystem_ftpext"))
+		//if php has enabled ftp module ,use it ,else ,uses sockets API
+		$method = function_exists('ftp_login') ? 'ftpext' : 'ftpsockets';
+		if (!class_exists("WP_Filesystem_{$method}"))
 		{
 			$abstraction_file = ABSPATH . 'wp-admin/includes/class-wp-filesystem-' . $method . '.php';
 			if (!file_exists($abstraction_file))
@@ -332,7 +358,7 @@ class hacklogra
 			}
 			require_once($abstraction_file);
 		}
-		$method = "WP_Filesystem_$method";
+		$method = "WP_Filesystem_{$method}";
 		self::$fs = new $method($args);
 		//Define the timeouts for the connections. Only available after the construct is called to allow for per-transport overriding of the default.
 		if (!defined('FS_CONNECT_TIMEOUT'))
@@ -345,12 +371,8 @@ class hacklogra
 
 		if (!self::$fs->connect())
 			return false; //There was an erorr connecting to the server.
-
-
-
-
-			
-// Set the permission constants if not already set.
+		
+		// Set the permission constants if not already set.
 		if (!defined('FS_CHMOD_DIR'))
 			define('FS_CHMOD_DIR', 0755);
 		if (!defined('FS_CHMOD_FILE'))
@@ -374,7 +396,7 @@ class hacklogra
 				'hostname' => self::$ftp_server,
 				'port' => self::$ftp_port,
 				'username' => self::$ftp_user,
-				'password' => self::$ftp_pwd,
+				'password' => self::decrypt(self::$ftp_pwd),
 				'ssl' => FALSE,
 			);
 			if (!self::setup_ftp($credentials))
@@ -715,7 +737,7 @@ class hacklogra
 				'hostname' => $_POST['ftp_server'],
 				'port' => $_POST['ftp_port'],
 				'username' => $_POST['ftp_user'],
-				'password' => $_POST['ftp_pwd'],
+				'password' => !empty($_POST['ftp_pwd']) ? $_POST['ftp_pwd'] : self::decrypt(self::$ftp_pwd),
 				'ssl' => FALSE,
 			);
 			if (self::setup_ftp($credentials))
@@ -795,7 +817,7 @@ class hacklogra
 						<th scope="row"><label for="ftp_pwd"><?php _e('Ftp password', self::textdomain) ?>:</label></th>
 						<td>
 							<input name="ftp_pwd" type="password" class="regular-text" size="60" id="ftp_pwd"
-								   value="<?php echo self::get_opt('ftp_pwd'); ?>"/>
+								   value=""/>
 							<span class="description"><?php _e('the password.', self::textdomain) ?></span>
 						</td>
 					</tr>
