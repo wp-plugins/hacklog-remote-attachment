@@ -20,7 +20,7 @@ class hacklogra
 	const version = '1.2.3';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
-	private static $ftp_pwd = 'admin';
+	private static $ftp_pwd = '4d4173594c77453d';
 	private static $ftp_server = '172.30.16.31';
 	private static $ftp_port = 21;
 	private static $ftp_timeout = 30;
