@@ -459,7 +459,7 @@ class hacklogra
 		if (!self::connect_remote_server())
 		{
 			//failed ,delete the orig file
-			unlink($file['file']);
+			is_file($file['file']) && unlink($file['file']);
 			return self::raise_connection_error();
 		}
 		$upload_error_handler = 'wp_handle_upload_error';
@@ -515,7 +515,7 @@ class hacklogra
 		//uploaded successfully
 		self::update_filesize_used($localfile);
 		//delete the local file
-		unlink($file['file']);
+		is_file($file['file']) && unlink($file['file']);
 		$file['url'] = str_replace(self::$local_url, self::$remote_url, $file['url']);
 		return $file;
 	}
@@ -546,14 +546,22 @@ class hacklogra
 
 		if (isset($metadata['sizes']) && count($metadata['sizes']) > 0)
 		{
+			//there may be duplicated filenames,so ....
+			$uniqe_images = array();
 			foreach ($metadata['sizes'] as $image_size => $image_item)
 			{
-				$relative_filepath = dirname($metadata['file']) . DIRECTORY_SEPARATOR . $metadata['sizes'][$image_size]['file'];
+				$uniqe_images[]= $image_item['file'];
+			}
+			$uniqe_images = array_unique($uniqe_images);
+			foreach($uniqe_images as $image_filename)
+			{
+				$relative_filepath = dirname($metadata['file']) . '/' . $image_filename;
 				if (!self::upload_file($relative_filepath))
 				{
 					return self::raise_upload_error();
 				}
 			}
+
 		}
 		return $metadata;
 	}
@@ -565,9 +573,13 @@ class hacklogra
 	 */
 	private static function upload_file($relative_path)
 	{
-		$local_filepath = self::$local_basepath . DIRECTORY_SEPARATOR . $relative_path;
+		$local_filepath = self::$local_basepath . '/' .  $relative_path;
 		$local_basename = basename($local_filepath);
 		$remotefile = self::$ftp_remote_path . self::$subdir . '/' . $local_basename;
+		if( !file_exists($local_filepath) )
+		{
+			return FALSE;
+		}
 		$file_data = file_get_contents($local_filepath);
 		if (!self::$fs->put_contents($remotefile, $file_data, 0644))
 		{
@@ -578,7 +590,6 @@ class hacklogra
 			//更新占用空间
 			self::update_filesize_used($local_filepath);
 			unlink($local_filepath);
-			unset($file_data);
 			return TRUE;
 		}
 	}
