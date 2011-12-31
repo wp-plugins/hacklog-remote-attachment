@@ -17,7 +17,7 @@ class hacklogra
 	const plugin_name = 'Hacklog Remote Attachment';
 	const opt_space = 'hacklogra_remote_filesize';
 	const opt_primary = 'hacklogra_options';
-	const version = '1.2.3';
+	const version = '1.2.4';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
 	private static $ftp_pwd = '4d4173594c77453d';
