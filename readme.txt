@@ -3,8 +3,8 @@ Contributors: ihacklog
 Donate link: http://ihacklog.com/donate
 Tags: attachment,manager,admin,images,thumbnail,ftp,remote
 Requires at least: 3.3
-Tested up to: 3.3
-Stable tag: 1.2.4
+Tested up to: 3.3.1
+Stable tag: 1.2.5
 
 Adds remote attachments support for your WordPress blog.
 
@@ -66,6 +66,10 @@ You can visit [plugin homepage](http://ihacklog.com/?p=5001 "plugin homepage") f
 
 
 == Changelog ==
+
+= 1.2.5 =
+* fixed: tools-- "You do not have permission to do this" error.
+* fixed: wp_delete_file HOOK should return a value (string)
 
 = 1.2.4 =
 * added: duplicated thumbnail filename (this things may happen when crop is TRUE)

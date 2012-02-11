@@ -17,7 +17,7 @@ class hacklogra
 	const plugin_name = 'Hacklog Remote Attachment';
 	const opt_space = 'hacklogra_remote_filesize';
 	const opt_primary = 'hacklogra_options';
-	const version = '1.2.4';
+	const version = '1.2.5';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
 	private static $ftp_pwd = '4d4173594c77453d';
@@ -663,6 +663,7 @@ class hacklogra
 		self::connect_remote_server();
 		self::decrease_filesize_used(self::$fs, $file);
 		self::$fs->delete($file, false, 'f');
+		return '';
 	}
 
 	/**
@@ -892,7 +893,7 @@ class hacklogra
 			<p style="color:#4e9a06;font-size:14px;">
 		<?php _e('if you have moved all your attachments to the remote server,then you can click', self::textdomain); ?>
 				<a onclick="return confirm('<?php _e('Are your sure to do this?Make sure you have backuped your database tables.', self::textdomain); ?>');"
-				   href="<?php echo admin_url('options-general.php?page=' . plugin_basename(HACKLOG_RA_LOADER)); ?>&hacklog_do=replace_old_post_attach_url"><strong><?php _e('here', self::textdomain); ?></strong></a><?php _e(' to update the database.', self::textdomain); ?>
+				   href="<?php echo admin_url('options-general.php?page=' . md5(HACKLOG_RA_LOADER)); ?>&hacklog_do=replace_old_post_attach_url"><strong><?php _e('here', self::textdomain); ?></strong></a><?php _e(' to update the database.', self::textdomain); ?>
 			</p>
 
 			<h3><?php _e('Recovery', self::textdomain); ?></h3>
@@ -900,7 +901,7 @@ class hacklogra
 			<p style="color:#4e9a06;font-size:14px;">
 		<?php _e('if you have moved all your attachments from the remote server to local server,then you can click', self::textdomain); ?>
 				<a onclick="return confirm('<?php _e('Are your sure to do this?Make sure you have backuped your database tables.', self::textdomain); ?>');"
-				   href="<?php echo admin_url('options-general.php?page=' . plugin_basename(HACKLOG_RA_LOADER)); ?>&hacklog_do=recovery_post_attach_url"><strong><?php _e('here', self::textdomain); ?></strong></a><?php _e(' to update the database.', self::textdomain); ?>
+				   href="<?php echo admin_url('options-general.php?page=' . md5(HACKLOG_RA_LOADER)); ?>&hacklog_do=recovery_post_attach_url"><strong><?php _e('here', self::textdomain); ?></strong></a><?php _e(' to update the database.', self::textdomain); ?>
 			</p>
 		</div>
 		<?php
