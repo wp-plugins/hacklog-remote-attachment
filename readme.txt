@@ -4,7 +4,7 @@ Donate link: http://ihacklog.com/donate
 Tags: attachment,manager,admin,images,thumbnail,ftp,remote
 Requires at least: 3.3
 Tested up to: 3.3.1
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 
 Adds remote attachments support for your WordPress blog.
 
@@ -34,6 +34,7 @@ For MORE information,please visit the [plugin homepage](http://ihacklog.com/?p=5
 * 1.2.1 修正在后台上传主题或插件时的bug.
 * 1.2.3 加密保存FTP密码,增加插件兼容性（同时支持ftp扩展方式和socket方式连接远程FTP服务器）
 * 1.2.4 增加重复缩略图字段检测
+* 1.2.6 增加对xmlrpc支持(支持通过Windows Live Writer 上传图片时自动上传到远程ftp服务器)
 
 更多信息请访问[插件主页](http://ihacklog.com/?p=5001 "plugin homepage") 获取关于插件的更多信息，使用技巧等.
 [安装指导](http://ihacklog.com/?p=4993 "安装指导") 
@@ -66,6 +67,9 @@ You can visit [plugin homepage](http://ihacklog.com/?p=5001 "plugin homepage") f
 
 
 == Changelog ==
+
+= 1.2.6 =
+* added: xmlrpc support (when use Windows Live Writer or other client via xmlrpc upload attahcment,the attachment will auto uploaded to remote FTP server )
 
 = 1.2.5 =
 * fixed: tools-- "You do not have permission to do this" error.

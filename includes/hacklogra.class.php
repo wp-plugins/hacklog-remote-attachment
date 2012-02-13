@@ -17,7 +17,7 @@ class hacklogra
 	const plugin_name = 'Hacklog Remote Attachment';
 	const opt_space = 'hacklogra_remote_filesize';
 	const opt_primary = 'hacklogra_options';
-	const version = '1.2.5';
+	const version = '1.2.6';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
 	private static $ftp_pwd = '4d4173594c77453d';
@@ -44,35 +44,36 @@ class hacklogra
 		add_action('init', array(__CLASS__, 'load_textdomain'));
 		//menu
 		add_action('admin_menu', array(__CLASS__, 'plugin_menu'));
-		//HOOK the upload
-		add_action('admin_init', array(__CLASS__, 'admin_init'));
+		//HOOK the upload , use init to support xmlrpc upload
+		add_action('init', array(__CLASS__, 'admin_init'));
 		//frontend filter,filter on image only
 		add_filter('wp_get_attachment_url', array(__CLASS__, 'replace_baseurl'), -999);
 	}
 
 ############################## PRIVATE FUNCTIONS ##############################################
-	private static function encrypt($plain_text )
+
+	private static function encrypt($plain_text)
 	{
-		if( !class_exists('Crypt') )
+		if (!class_exists('Crypt'))
 		{
-			require dirname(__FILE__). '/crypt.class.php';
+			require dirname(__FILE__) . '/crypt.class.php';
 		}
-		$cypher = new Crypt(Crypt::CRYPT_MODE_HEXADECIMAL,Crypt::CRYPT_HASH_SHA1);
-		$cypher->Key = AUTH_KEY;		
+		$cypher = new Crypt(Crypt::CRYPT_MODE_HEXADECIMAL, Crypt::CRYPT_HASH_SHA1);
+		$cypher->Key = AUTH_KEY;
 		return $cypher->encrypt($plain_text);
 	}
-	
-	private static function decrypt($encrypted )
+
+	private static function decrypt($encrypted)
 	{
-		if( !class_exists('Crypt') )
+		if (!class_exists('Crypt'))
 		{
-			require dirname(__FILE__). '/crypt.class.php';
+			require dirname(__FILE__) . '/crypt.class.php';
 		}
-		$cypher = new Crypt(Crypt::CRYPT_MODE_HEXADECIMAL,Crypt::CRYPT_HASH_SHA1);
+		$cypher = new Crypt(Crypt::CRYPT_MODE_HEXADECIMAL, Crypt::CRYPT_HASH_SHA1);
 		$cypher->Key = AUTH_KEY;
-		return $cypher->decrypt( $encrypted );
+		return $cypher->decrypt($encrypted);
 	}
-	
+
 	private static function update_options()
 	{
 		$value = self::get_default_opts();
@@ -82,7 +83,7 @@ class hacklogra
 			if (!empty($_POST[$key]))
 			{
 				$value[$key] = addslashes(trim($_POST[$key]));
-				if( 'ftp_pwd' == $key)
+				if ('ftp_pwd' == $key)
 				{
 					$value[$key] = self::encrypt($value[$key]);
 				}
@@ -184,13 +185,26 @@ class hacklogra
 		return array('error' => $message);
 	}
 
+	static function xmlrpc_error($errorString = '')
+	{
+		return new IXR_Error(500, $errorString);
+	}
+
 	/**
 	 * report upload error
 	 * @return type 
 	 */
 	private static function raise_upload_error()
 	{
-		return call_user_func(array(__CLASS__, 'handle_upload_error'), sprintf('%s:' . __('upload file to remote server failed!', self::textdomain), self::plugin_name));
+		$error_str = sprintf('%s:' . __('upload file to remote server failed!', self::textdomain), self::plugin_name);
+		if (defined('XMLRPC_REQUEST'))
+		{
+			return self::xmlrpc_error($error_str);
+		}
+		else
+		{
+			return call_user_func(array(__CLASS__, 'handle_upload_error'), $error_str);
+		}
 	}
 
 	/**
@@ -199,7 +213,15 @@ class hacklogra
 	 */
 	private static function raise_connection_error()
 	{
-		return call_user_func(array(__CLASS__, 'handle_upload_error'), sprintf('%s:' . self::$fs->errors->get_error_message(), self::plugin_name));
+		$error_str = sprintf('%s:' . self::$fs->errors->get_error_message(), self::plugin_name);
+		if (defined('XMLRPC_REQUEST'))
+		{
+			return self::xmlrpc_error($error_str);
+		}
+		else
+		{
+			return call_user_func(array(__CLASS__, 'handle_upload_error'), $error_str);
+		}
 	}
 
 ############################## PUBLIC FUNCTIONS ##############################################
@@ -371,8 +393,11 @@ class hacklogra
 
 		if (!self::$fs->connect())
 			return false; //There was an erorr connecting to the server.
-		
-		// Set the permission constants if not already set.
+
+
+
+			
+// Set the permission constants if not already set.
 		if (!defined('FS_CHMOD_DIR'))
 			define('FS_CHMOD_DIR', 0755);
 		if (!defined('FS_CHMOD_FILE'))
@@ -418,7 +443,7 @@ class hacklogra
 			if (!self::connect_remote_server())
 			{
 				$error = self::raise_connection_error();
-				$redirect_msg = sprintf(__('Click <a href="%s">here</a> to setup the plugin options.',self::textdomain), admin_url('options-general.php?page=' . md5(HACKLOG_RA_LOADER)));
+				$redirect_msg = sprintf(__('Click <a href="%s">here</a> to setup the plugin options.', self::textdomain), admin_url('options-general.php?page=' . md5(HACKLOG_RA_LOADER)));
 				echo '<div class="error"><p><strong>' . $error['error'] . '<br />' . $redirect_msg . '</strong></p></div>';
 			}
 		}
@@ -456,10 +481,17 @@ class hacklogra
 	 */
 	public static function upload_and_send($file)
 	{
+		/**
+		 * 泥马， xmlrpc mw_newMediaObject 方法中的 wp_handle_upload HOOK  file 参数仅为文件名！
+		 */
+		if (defined('XMLRPC_REQUEST'))
+		{
+			$file['file'] = self::$local_path . '/' . $file['file'];
+		}
 		if (!self::connect_remote_server())
 		{
 			//failed ,delete the orig file
-			is_file($file['file']) && unlink($file['file']);
+			file_exists($file['file']) && unlink($file['file']);
 			return self::raise_connection_error();
 		}
 		$upload_error_handler = 'wp_handle_upload_error';
@@ -474,7 +506,7 @@ class hacklogra
 		if ($local_basename_unique != $local_basename)
 		{
 			$local_full_filename = dirname($file['file']) . '/' . $local_basename_unique;
-			rename($file['file'], $local_full_filename);
+			@rename($file['file'], $local_full_filename);
 			$file['file'] = $local_full_filename;
 		}
 		$localfile = $file['file'];
@@ -497,25 +529,51 @@ class hacklogra
 			}
 			if (!self::$fs->is_dir($remote_subdir))
 			{
-				return call_user_func($upload_error_handler, &$file, sprintf('%s:' . __('failed to make dir on remote server!Please check your FTP permissions.', self::textdomain), self::plugin_name));
+				$error_str = sprintf('%s:' . __('failed to make dir on remote server!Please check your FTP permissions.', self::textdomain), self::plugin_name);
+				if (defined('XMLRPC_REQUEST'))
+				{
+					return self::xmlrpc_error($error_str);
+				}
+				else
+				{
+					return call_user_func($upload_error_handler, &$file, $error_str);
+				}
 			}
 		}
 		//如果是图片，此处不处理，因为要与水印插件兼容的原因　
 		if (self::is_image_file($file['file']))
 		{
+			//对xmlrpc 这里又给它还原
+			if (defined('XMLRPC_REQUEST'))
+			{
+				$file['file'] = basename($file['file']);
+			}
 			return $file;
 		}
 		$content = file_get_contents($localfile);
 		//        return array('error'=> $remotefile);
 		if (!self::$fs->put_contents($remotefile, $content, 0644))
 		{
-			return call_user_func($upload_error_handler, &$file, sprintf('%s:' . __('upload file to remote server failed!', self::textdomain), self::plugin_name));
+			$error_str = sprintf('%s:' . __('upload file to remote server failed!', self::textdomain), self::plugin_name);
+			if (defined('XMLRPC_REQUEST'))
+			{
+				return self::xmlrpc_error($error_str);
+			}
+			else
+			{
+				return call_user_func($upload_error_handler, &$file, $error_str);
+			}
 		}
 		unset($content);
 		//uploaded successfully
 		self::update_filesize_used($localfile);
 		//delete the local file
-		is_file($file['file']) && unlink($file['file']);
+		file_exists($file['file']) && unlink($file['file']);
+		//对于非图片文件，且为xmlrpc的情况，还原file参数
+		if (defined('XMLRPC_REQUEST'))
+		{
+			$file['file'] = basename($file['file']);
+		}
 		$file['url'] = str_replace(self::$local_url, self::$remote_url, $file['url']);
 		return $file;
 	}
@@ -550,10 +608,10 @@ class hacklogra
 			$uniqe_images = array();
 			foreach ($metadata['sizes'] as $image_size => $image_item)
 			{
-				$uniqe_images[]= $image_item['file'];
+				$uniqe_images[] = $image_item['file'];
 			}
 			$uniqe_images = array_unique($uniqe_images);
-			foreach($uniqe_images as $image_filename)
+			foreach ($uniqe_images as $image_filename)
 			{
 				$relative_filepath = dirname($metadata['file']) . '/' . $image_filename;
 				if (!self::upload_file($relative_filepath))
@@ -561,7 +619,6 @@ class hacklogra
 					return self::raise_upload_error();
 				}
 			}
-
 		}
 		return $metadata;
 	}
@@ -573,10 +630,10 @@ class hacklogra
 	 */
 	private static function upload_file($relative_path)
 	{
-		$local_filepath = self::$local_basepath . '/' .  $relative_path;
+		$local_filepath = self::$local_basepath . '/' . $relative_path;
 		$local_basename = basename($local_filepath);
 		$remotefile = self::$ftp_remote_path . self::$subdir . '/' . $local_basename;
-		if( !file_exists($local_filepath) )
+		if (!file_exists($local_filepath))
 		{
 			return FALSE;
 		}
@@ -589,7 +646,7 @@ class hacklogra
 		{
 			//更新占用空间
 			self::update_filesize_used($local_filepath);
-			unlink($local_filepath);
+			@unlink($local_filepath);
 			return TRUE;
 		}
 	}
@@ -790,7 +847,7 @@ class hacklogra
 		}
 		?>
 		<div class="wrap">
-		<?php screen_icon(); ?>
+			<?php screen_icon(); ?>
 			<h2> <?php _e('Hacklog Remote Attachment Options', self::textdomain) ?></h2>
 			<?php
 			self::show_message($msg, 'm');
@@ -879,19 +936,19 @@ class hacklogra
 			<h2> <?php _e('Hacklog Remote Attachment Status', self::textdomain); ?></h2>
 
 			<p style="color:#999999;font-size:14px;">
-		<?php _e('Space used on remote server:', self::textdomain); ?><?php echo self::human_size(get_option(hacklogra::opt_space)); ?>
+				<?php _e('Space used on remote server:', self::textdomain); ?><?php echo self::human_size(get_option(hacklogra::opt_space)); ?>
 			</p>
 			<hr/>
 			<h2>Tools</h2>
 
 			<p style="color:#f00;font-size:14px;"><strong><?php _e('warning:', self::textdomain); ?></strong>
-		<?php _e("if you haven't moved all your attachments OR dont't know what below means,please <strong>DO NOT</strong> click the link below!", self::textdomain); ?>
+				<?php _e("if you haven't moved all your attachments OR dont't know what below means,please <strong>DO NOT</strong> click the link below!", self::textdomain); ?>
 			</p>
 
 			<h3><?php _e('Move', self::textdomain); ?></h3>
 
 			<p style="color:#4e9a06;font-size:14px;">
-		<?php _e('if you have moved all your attachments to the remote server,then you can click', self::textdomain); ?>
+				<?php _e('if you have moved all your attachments to the remote server,then you can click', self::textdomain); ?>
 				<a onclick="return confirm('<?php _e('Are your sure to do this?Make sure you have backuped your database tables.', self::textdomain); ?>');"
 				   href="<?php echo admin_url('options-general.php?page=' . md5(HACKLOG_RA_LOADER)); ?>&hacklog_do=replace_old_post_attach_url"><strong><?php _e('here', self::textdomain); ?></strong></a><?php _e(' to update the database.', self::textdomain); ?>
 			</p>
@@ -899,7 +956,7 @@ class hacklogra
 			<h3><?php _e('Recovery', self::textdomain); ?></h3>
 
 			<p style="color:#4e9a06;font-size:14px;">
-		<?php _e('if you have moved all your attachments from the remote server to local server,then you can click', self::textdomain); ?>
+				<?php _e('if you have moved all your attachments from the remote server to local server,then you can click', self::textdomain); ?>
 				<a onclick="return confirm('<?php _e('Are your sure to do this?Make sure you have backuped your database tables.', self::textdomain); ?>');"
 				   href="<?php echo admin_url('options-general.php?page=' . md5(HACKLOG_RA_LOADER)); ?>&hacklog_do=recovery_post_attach_url"><strong><?php _e('here', self::textdomain); ?></strong></a><?php _e(' to update the database.', self::textdomain); ?>
 			</p>
