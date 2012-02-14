@@ -17,7 +17,7 @@ class hacklogra
 	const plugin_name = 'Hacklog Remote Attachment';
 	const opt_space = 'hacklogra_remote_filesize';
 	const opt_primary = 'hacklogra_options';
-	const version = '1.2.6';
+	const version = '1.2.7';
 	private static $img_ext = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	private static $ftp_user = 'admin';
 	private static $ftp_pwd = '4d4173594c77453d';
@@ -540,6 +540,9 @@ class hacklogra
 				}
 			}
 		}
+		
+		//xmlrpc 得在这里处理url
+		$file['url'] = str_replace(self::$local_url, self::$remote_url, $file['url']);
 		//如果是图片，此处不处理，因为要与水印插件兼容的原因　
 		if (self::is_image_file($file['file']))
 		{
@@ -574,7 +577,6 @@ class hacklogra
 		{
 			$file['file'] = basename($file['file']);
 		}
-		$file['url'] = str_replace(self::$local_url, self::$remote_url, $file['url']);
 		return $file;
 	}
 
