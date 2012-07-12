@@ -3,8 +3,8 @@ Contributors: ihacklog
 Donate link: http://ihacklog.com/donate
 Tags: attachment,manager,admin,images,thumbnail,ftp,remote
 Requires at least: 3.3
-Tested up to: 3.3.1
-Stable tag: 1.2.7
+Tested up to: 3.4.1
+Stable tag: 1.2.8
 
 Adds remote attachments support for your WordPress blog.
 
@@ -36,6 +36,7 @@ For MORE information,please visit the [plugin homepage](http://ihacklog.com/?p=5
 * 1.2.4 增加重复缩略图字段检测
 * 1.2.6 增加对xmlrpc支持(支持通过Windows Live Writer 上传图片时自动上传到远程ftp服务器)
 * 1.2.7 修复Windows Live Writer 上传图片时url不正确的bug
+* 1.2.8 修复在PHP 5.3.x以后版本中报“Fatal error: Call-time pass-by-reference has been removed in hacklogra.class.php on line 539”错误的兼容性bug.
 
 更多信息请访问[插件主页](http://ihacklog.com/?p=5001 "plugin homepage") 获取关于插件的更多信息，使用技巧等.
 [安装指导](http://ihacklog.com/?p=4993 "安装指导") 
@@ -68,6 +69,9 @@ You can visit [plugin homepage](http://ihacklog.com/?p=5001 "plugin homepage") f
 
 
 == Changelog ==
+
+= 1.2.8 =
+* fixed: compatibility with PHP version above 5.3.x ,to avoid PHP complains “Fatal error: Call-time pass-by-reference has been removed in hacklogra.class.php on line 539”.
 
 = 1.2.7 =
 * fixed: Windows Live Writer file uploading bug(url incorrect).
