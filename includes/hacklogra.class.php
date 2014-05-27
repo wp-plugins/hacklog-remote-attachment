@@ -352,7 +352,7 @@ class hacklogra
 				add_filter('media_send_to_editor', array(__CLASS__, 'replace_attachurl'), -999);
 				add_filter('attachment_link', array(__CLASS__, 'replace_baseurl'), -999);
 				//生成缩略图后立即上传生成的文件并删除本地文件,this must after watermark generate
-				add_filter('wp_generate_attachment_metadata', array(__CLASS__, 'upload_images'), 999);
+				add_filter('wp_update_attachment_metadata', array(__CLASS__, 'upload_images'), 999);
 				//删除远程附件
 				add_action('wp_delete_file', array(__CLASS__, 'delete_remote_file'));
 				break;
